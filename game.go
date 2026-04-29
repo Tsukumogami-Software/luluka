@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/Tsukumogami-Software/luluka/shader"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -50,24 +49,14 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return screenWidth, screenHeight
 }
 
-func ParseUniforms(source []byte) {
-	program, err := shader.Compile(source, "__vertex", "Fragment", 4)
-	if err != nil {
-		log.Panicf("Failed to parse shader: %v", err)
-	}
-
-	for i, uniformType := range program.Uniforms {
-		log.Printf("Found uniform %s: %v\n", program.UniformNames[i], uniformType)
-	}
-}
-
-func Run(shaderPath string) {
+func Run(shaderPath string, uniformFlags []string) {
 	shaderFile, err := os.ReadFile(shaderPath)
 	if err != nil {
 		log.Panicf("Failed to read shader file: %v", err)
 	}
 
-	ParseUniforms(shaderFile)
+	uniformsDeclarations := parseUniformDeclarations(shaderFile)
+	parseUniformValues(uniformFlags, uniformsDeclarations)
 
 	shader, err := ebiten.NewShader(shaderFile)
 	if err != nil {
