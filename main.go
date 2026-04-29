@@ -27,7 +27,7 @@ Optionally specify uniforms using -u.
 }
 
 func init() {
-	rootCmd.Flags().StringSliceP("uniform", "u", []string{}, "specifies a uniform value")
+	rootCmd.Flags().StringSliceP("uniform", "u", []string{}, "specifies a uniform value (use name.0 name.1 etc for vectors)")
 }
 
 func main() {

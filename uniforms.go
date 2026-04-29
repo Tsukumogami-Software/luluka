@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/Tsukumogami-Software/luluka/shader"
@@ -56,26 +57,144 @@ func defaultUniformValue(t shaderir.Type) any {
 	return 0
 }
 
-func parseUniformValues(uniformFlags []string, uniformsDeclarations map[string]shaderir.Type) map[string]any {
-	result := make(map[string]any, len(uniformsDeclarations))
-	for name, t := range uniformsDeclarations {
-		result[name] = defaultUniformValue(t)
+func getVectorFlagIndex(name string) (string, int, bool) {
+	split := strings.Split(name, ".")
+	if len(split) != 2 {
+		return name, 0, false
 	}
 
+	index, err := strconv.Atoi(split[1])
+	if err != nil {
+		log.Printf("Failed to parse vector index from flag: %s", name)
+		return name, 0, false
+	}
+
+	return split[0], index, true
+}
+
+func parseUniformValue(t shaderir.Type, values map[int]string) any {
+	// TODO: parse Mat2, Mat3, Mat4, Texture, Array, Struct
+	switch t.Main{
+	case shaderir.Bool:
+		res, err := strconv.ParseBool(values[0])
+		if err != nil {
+			log.Panicf("Failed to parse bool: %s", values[0])
+		}
+		return res
+	case shaderir.Int:
+		res, err := strconv.ParseInt(values[0], 10, 32)
+		if err != nil {
+			log.Printf("Failed to parse int: %s", values[0])
+		}
+		return res
+	case shaderir.Float:
+		res, err := strconv.ParseFloat(values[0], 32)
+		if err != nil {
+			log.Printf("Failed to parse float: %s", values[0])
+		}
+		return res
+	case shaderir.Vec2:
+		res := make([]float32, 2)
+		for index := range 2 {
+			f, err := strconv.ParseFloat(values[index], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[index])
+			}
+			res[index] = float32(f)
+		}
+		return res
+	case shaderir.Vec3:
+		res := make([]float32, 3)
+		for index := range 3 {
+			f, err := strconv.ParseFloat(values[index], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[index])
+			}
+			res[index] = float32(f)
+		}
+		return res
+	case shaderir.Vec4:
+		res := make([]float32, 4)
+		for index := range 4 {
+			f, err := strconv.ParseFloat(values[index], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[index])
+			}
+			res[index] = float32(f)
+		}
+		return res
+	case shaderir.IVec2:
+		res := make([]int32, 2)
+		for index := range 2 {
+			f, err := strconv.ParseFloat(values[index], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[index])
+			}
+			res[index] = int32(f)
+		}
+		return res
+	case shaderir.IVec3:
+		res := make([]int32, 3)
+		for index := range 3 {
+			f, err := strconv.ParseFloat(values[index], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[index])
+			}
+			res[index] = int32(f)
+		}
+		return res
+	case shaderir.IVec4:
+		res := make([]int32, 4)
+		for index := range 4 {
+			f, err := strconv.ParseFloat(values[index], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[index])
+			}
+			res[index] = int32(f)
+		}
+		return res
+	}
+	return 0
+}
+
+func makeUniformFlagsMap(uniformFlags []string) map[string]map[int]string {
+	parsedFlags := make(map[string]map[int]string, len(uniformFlags))
 	for _, flag := range uniformFlags {
 		split := strings.Split(flag, ":")
 		if len(split) != 2 {
 			log.Panicf("Invalid uniform flag: %s", flag)
 		}
 
-		//TODO: check that this matches the uniforms declarations
-		existing, ok := result[split[0]]
-		if ok {
-			existing = append(existing.([]any), split[1])
-		} else {
-			result[split[0]] = split[1]
+		splitName := strings.Split(split[0], ".")
+		if len(splitName) == 2 {
+			vecIndex, err := strconv.Atoi(splitName[1])
+			if err != nil {
+				log.Panicf("Failed to parse vector index: %s", flag)
+			}
+			_, exists := parsedFlags[splitName[0]]
+			if exists {
+				parsedFlags[splitName[0]][vecIndex] = split[1]
+			} else {
+				parsedFlags[splitName[0]] = map[int]string{
+					vecIndex: split[1],
+				}
+			}
 		}
 	}
+	return parsedFlags
+}
+
+func parseUniformValues(uniformFlags []string, uniformsDeclarations map[string]shaderir.Type) map[string]any {
+	result := make(map[string]any, len(uniformsDeclarations))
+	for name, t := range uniformsDeclarations {
+		result[name] = defaultUniformValue(t)
+	}
+
+	uniformFlagsMap := makeUniformFlagsMap(uniformFlags)
+	for key, values := range uniformFlagsMap {
+		result[key] = parseUniformValue(uniformsDeclarations[key], values)
+	}
+
 	return result
 }
 

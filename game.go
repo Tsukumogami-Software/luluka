@@ -18,23 +18,19 @@ var game *Game
 // Game contains the compiled shader and keeps track of the time
 type Game struct {
 	shader    *ebiten.Shader
+	uniforms  map[string]any
 	startTime time.Time
 }
 
 // Draw displays the shader on the entire screen
 func (g *Game) Draw(screen *ebiten.Image) {
+	g.uniforms["Time"] = time.Now().Sub(g.startTime).Seconds()
 	screen.DrawRectShader(
 		screenWidth,
 		screenHeight,
 		g.shader,
 		&ebiten.DrawRectShaderOptions{
-			Uniforms: map[string]any{
-				"Center": []float32{
-					float32(screenWidth) / 2,
-					float32(screenHeight) / 2,
-				},
-				"Time": time.Now().Sub(g.startTime).Seconds(),
-			},
+			Uniforms: g.uniforms,
 		},
 	)
 }
@@ -56,7 +52,7 @@ func Run(shaderPath string, uniformFlags []string) {
 	}
 
 	uniformsDeclarations := parseUniformDeclarations(shaderFile)
-	parseUniformValues(uniformFlags, uniformsDeclarations)
+	uniforms := parseUniformValues(uniformFlags, uniformsDeclarations)
 
 	shader, err := ebiten.NewShader(shaderFile)
 	if err != nil {
@@ -65,6 +61,7 @@ func Run(shaderPath string, uniformFlags []string) {
 
 	game = &Game{
 		shader:    shader,
+		uniforms:  uniforms,
 		startTime: time.Now(),
 	}
 	if err := ebiten.RunGame(game); err != nil {
