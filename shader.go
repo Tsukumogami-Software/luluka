@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Tsukumogami-Software/Luluka/shader"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -49,11 +50,17 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return screenWidth, screenHeight
 }
 
+func ParseUniforms(source []byte) {
+	shader.Compile(source, "__vertex", "Fragment", 4)
+}
+
 func Run(shaderPath string) {
 	shaderFile, err := os.ReadFile(shaderPath)
 	if err != nil {
 		log.Panicf("Failed to read shader file: %v", err)
 	}
+
+	ParseUniforms(shaderFile)
 
 	shader, err := ebiten.NewShader(shaderFile)
 	if err != nil {
