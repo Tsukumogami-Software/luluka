@@ -10,7 +10,7 @@ import (
 )
 
 // TODO: handle Sub types
-// TODO: handle Texture, Array, Struct
+// TODO: handle Texture, Struct
 // TODO: double check, matrices may need to be flattened
 
 func defaultUniformValue(t shaderir.Type) any {
@@ -49,6 +49,12 @@ func defaultUniformValue(t shaderir.Type) any {
 		result := make([][]float64, 2)
 		for i := range 2 {
 			result[i] = make([]float64, 2)
+		}
+		return result
+	case shaderir.Array:
+		result := make([]any, t.Length)
+		for i := range t.Length {
+			result[i] = defaultUniformValue(t.Sub[0])
 		}
 		return result
 	}
