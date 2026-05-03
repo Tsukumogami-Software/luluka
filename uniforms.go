@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Tsukumogami-Software/luluka/shader"
+	"github.com/Tsukumogami-Software/luluka/graphics"
 	"github.com/Tsukumogami-Software/luluka/shaderir"
 )
 
@@ -199,7 +199,7 @@ func parseUniformValues(uniformFlags []string, uniformsDeclarations map[string]s
 }
 
 func parseUniformDeclarations(source []byte) map[string]shaderir.Type {
-	program, err := shader.Compile(source, "__vertex", "Fragment", 4)
+	program, err := graphics.CompileShader(source)
 	if err != nil {
 		log.Panicf("Failed to parse shader: %v", err)
 	}
