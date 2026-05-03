@@ -24,7 +24,7 @@ type Game struct {
 
 // Draw displays the shader on the entire screen
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.uniforms["Time"] = time.Now().Sub(g.startTime).Seconds()
+	g.uniforms["Time"] = time.Since(g.startTime).Seconds()
 	screen.DrawRectShader(
 		screenWidth,
 		screenHeight,
