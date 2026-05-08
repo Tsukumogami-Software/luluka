@@ -1,0 +1,5 @@
+package sample
+
+func Fragment(_ vec4, texCoord vec2, _ vec4) vec4 {
+	return imageSrc0At(texCoord)
+}
