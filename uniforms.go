@@ -9,8 +9,6 @@ import (
 	"github.com/Tsukumogami-Software/luluka/shaderir"
 )
 
-// TODO: double check, matrices may need to be flattened
-
 func defaultUniformValue(t shaderir.Type) any {
 	switch t.Main {
 	case shaderir.Bool:
@@ -32,23 +30,11 @@ func defaultUniformValue(t shaderir.Type) any {
 	case shaderir.IVec4:
 		return make([]int32, 4)
 	case shaderir.Mat2:
-		result := make([][]float64, 2)
-		for i := range 2 {
-			result[i] = make([]float64, 2)
-		}
-		return result
+		return make([]float64, 4)
 	case shaderir.Mat3:
-		result := make([][]float64, 2)
-		for i := range 2 {
-			result[i] = make([]float64, 2)
-		}
-		return result
+		return make([]float64, 9)
 	case shaderir.Mat4:
-		result := make([][]float64, 2)
-		for i := range 2 {
-			result[i] = make([]float64, 2)
-		}
-		return result
+		return make([]float64, 16)
 	case shaderir.Array:
 		result := make([]any, t.Length)
 		for i := range t.Length {
@@ -62,7 +48,7 @@ func defaultUniformValue(t shaderir.Type) any {
 }
 
 func parseUniformValue(t shaderir.Type, values map[int]string) any {
-	// TODO: parse Mat2, Mat3, Mat4, Texture, Array, Struct
+	// TODO: parse Array
 	switch t.Main {
 	case shaderir.Bool:
 		res, err := strconv.ParseBool(values[0])
@@ -140,6 +126,36 @@ func parseUniformValue(t shaderir.Type, values map[int]string) any {
 				log.Printf("Failed to parse float: %s", values[index])
 			}
 			res[index] = int32(f)
+		}
+		return res
+	case shaderir.Mat2:
+		res := make([]float32, 4)
+		for index := range 4 {
+			f, err := strconv.ParseFloat(values[index], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[index])
+			}
+			res[index] = float32(f)
+		}
+		return res
+	case shaderir.Mat3:
+		res := make([]float32, 9)
+		for index := range 9 {
+			f, err := strconv.ParseFloat(values[index], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[index])
+			}
+			res[index] = float32(f)
+		}
+		return res
+	case shaderir.Mat4:
+		res := make([]float32, 16)
+		for index := range 16 {
+			f, err := strconv.ParseFloat(values[index], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[index])
+			}
+			res[index] = float32(f)
 		}
 		return res
 	}
