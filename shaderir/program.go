@@ -17,11 +17,9 @@ package shaderir
 
 import (
 	"bytes"
-	"encoding/hex"
 	"go/constant"
 	"go/token"
 	"hash/fnv"
-	"sort"
 	"strings"
 )
 
@@ -41,10 +39,6 @@ func CalcSourceHash(source []byte) SourceHash {
 	var hash SourceHash
 	h.Sum(hash[:0])
 	return hash
-}
-
-func (s SourceHash) String() string {
-	return hex.EncodeToString(s[:])
 }
 
 type Program struct {
@@ -394,117 +388,4 @@ func IsValidSwizzling(s string) bool {
 		return true
 	}
 	return false
-}
-
-func (p *Program) ReachableFuncsFromBlock(block *Block) []*Func {
-	indexToFunc := map[int]*Func{}
-	for _, f := range p.Funcs {
-		indexToFunc[f.Index] = &f
-	}
-
-	visited := map[int]struct{}{}
-	var indices []int
-	var f func(expr *Expr)
-	f = func(expr *Expr) {
-		if expr.Type != FunctionExpr {
-			return
-		}
-		if _, ok := visited[expr.Index]; ok {
-			return
-		}
-		indices = append(indices, expr.Index)
-		visited[expr.Index] = struct{}{}
-		walkExprs(f, indexToFunc[expr.Index].Block)
-	}
-	walkExprs(f, block)
-
-	sort.Ints(indices)
-
-	funcs := make([]*Func, 0, len(indices))
-	for _, i := range indices {
-		funcs = append(funcs, indexToFunc[i])
-	}
-	return funcs
-}
-
-func walkExprs(f func(expr *Expr), block *Block) {
-	if block == nil {
-		return
-	}
-	for _, s := range block.Stmts {
-		for _, e := range s.Exprs {
-			walkExprsInExpr(f, &e)
-		}
-		for _, b := range s.Blocks {
-			walkExprs(f, b)
-		}
-	}
-}
-
-func walkExprsInExpr(f func(expr *Expr), expr *Expr) {
-	if expr == nil {
-		return
-	}
-	f(expr)
-	for _, e := range expr.Exprs {
-		walkExprsInExpr(f, &e)
-	}
-}
-
-func (p *Program) appendReachableUniformVariablesFromBlock(indices []int, block *Block) []int {
-	indexToFunc := map[int]*Func{}
-	for _, f := range p.Funcs {
-		indexToFunc[f.Index] = &f
-	}
-
-	visitedFuncs := map[int]struct{}{}
-	indicesSet := map[int]struct{}{}
-	var f func(expr *Expr)
-	f = func(expr *Expr) {
-		switch expr.Type {
-		case UniformVariable:
-			if _, ok := indicesSet[expr.Index]; ok {
-				return
-			}
-			indicesSet[expr.Index] = struct{}{}
-			indices = append(indices, expr.Index)
-		case FunctionExpr:
-			if _, ok := visitedFuncs[expr.Index]; ok {
-				return
-			}
-			visitedFuncs[expr.Index] = struct{}{}
-			walkExprs(f, indexToFunc[expr.Index].Block)
-		}
-	}
-	walkExprs(f, block)
-
-	return indices
-}
-
-// FilterUniformVariables replaces uniform variables with 0 when they are not used.
-// By minimizing uniform variables, more commands can be merged in the graphicscommand package.
-func (p *Program) FilterUniformVariables(uniforms []uint32) {
-	if p.uniformFactors == nil {
-		indices := p.appendReachableUniformVariablesFromBlock(nil, p.VertexFunc.Block)
-		indices = p.appendReachableUniformVariablesFromBlock(indices, p.FragmentFunc.Block)
-		reachableUniforms := make([]bool, len(p.Uniforms))
-		for _, idx := range indices {
-			reachableUniforms[idx] = true
-		}
-		p.uniformFactors = make([]uint32, len(uniforms))
-		var idx int
-		for i, typ := range p.Uniforms {
-			c := typ.DwordCount()
-			if reachableUniforms[i] {
-				for i := idx; i < idx+c; i++ {
-					p.uniformFactors[i] = 1
-				}
-			}
-			idx += c
-		}
-	}
-
-	for i, factor := range p.uniformFactors {
-		uniforms[i] *= factor
-	}
 }

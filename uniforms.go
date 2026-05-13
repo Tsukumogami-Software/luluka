@@ -9,8 +9,6 @@ import (
 	"github.com/Tsukumogami-Software/luluka/shaderir"
 )
 
-// TODO: handle Sub types
-// TODO: handle Texture, Struct
 // TODO: double check, matrices may need to be flattened
 
 func defaultUniformValue(t shaderir.Type) any {
@@ -61,21 +59,6 @@ func defaultUniformValue(t shaderir.Type) any {
 
 	log.Panicf("Unknown uniform type: %v", t)
 	return 0
-}
-
-func getVectorFlagIndex(name string) (string, int, bool) {
-	split := strings.Split(name, ".")
-	if len(split) != 2 {
-		return name, 0, false
-	}
-
-	index, err := strconv.Atoi(split[1])
-	if err != nil {
-		log.Printf("Failed to parse vector index from flag: %s", name)
-		return name, 0, false
-	}
-
-	return split[0], index, true
 }
 
 func parseUniformValue(t shaderir.Type, values map[int]string) any {

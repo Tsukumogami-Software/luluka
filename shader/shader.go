@@ -142,21 +142,6 @@ func (b *block) findLocalVariable(name string, markLocalVariableUsed bool) (int,
 	return 0, shaderir.Type{}, false
 }
 
-func (b *block) findLocalVariableByIndex(idx int) (shaderir.Type, bool) {
-	bs := []*block{b}
-	for outer := b.outer; outer != nil; outer = outer.outer {
-		bs = append(bs, outer)
-	}
-	for i := len(bs) - 1; i >= 0; i-- {
-		if len(bs[i].vars) <= idx {
-			idx -= len(bs[i].vars)
-			continue
-		}
-		return bs[i].vars[idx].typ, true
-	}
-	return shaderir.Type{}, false
-}
-
 func (b *block) findConstant(name string) (constant, bool) {
 	if name == "" || name == "_" {
 		panic("shader: constant name must be non-empty and non-underscore")

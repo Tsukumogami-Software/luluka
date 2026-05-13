@@ -204,11 +204,3 @@ func CompileShader(fragmentSrc []byte) (*shaderir.Program, error) {
 
 	return ir, nil
 }
-
-func CalcSourceHash(fragmentSrc []byte) (shaderir.SourceHash, error) {
-	src, err := completeShaderSource(fragmentSrc)
-	if err != nil {
-		return shaderir.SourceHash{}, err
-	}
-	return shaderir.CalcSourceHash(src), nil
-}
