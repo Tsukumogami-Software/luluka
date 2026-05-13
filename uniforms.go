@@ -52,23 +52,23 @@ func defaultArrayValue(t shaderir.Type, length int) any {
 	case shaderir.Float:
 		return make([]float32, length)
 	case shaderir.Vec2:
-		return make([]float32, length * 2)
+		return make([]float32, length*2)
 	case shaderir.Vec3:
-		return make([]float32, length * 3)
+		return make([]float32, length*3)
 	case shaderir.Vec4:
-		return make([]float32, length * 4)
+		return make([]float32, length*4)
 	case shaderir.IVec2:
-		return make([]int32, length * 2)
+		return make([]int32, length*2)
 	case shaderir.IVec3:
-		return make([]int32, length * 3)
+		return make([]int32, length*3)
 	case shaderir.IVec4:
-		return make([]int32, length * 4)
+		return make([]int32, length*4)
 	case shaderir.Mat2:
-		return make([]float64, length * 4)
+		return make([]float64, length*4)
 	case shaderir.Mat3:
-		return make([]float64, length * 9)
+		return make([]float64, length*9)
 	case shaderir.Mat4:
-		return make([]float64, length * 16)
+		return make([]float64, length*16)
 	case shaderir.Array:
 		log.Panicf("Array of array is forbidden")
 	}
@@ -226,7 +226,7 @@ func parseArrayValue(t shaderir.Type, length int, values map[int]string) any {
 		}
 		return res
 	case shaderir.Vec2:
-		res := make([]float32, length * 2)
+		res := make([]float32, length*2)
 		for i := range length * 2 {
 			f, err := strconv.ParseFloat(values[i], 32)
 			if err != nil {
@@ -236,7 +236,7 @@ func parseArrayValue(t shaderir.Type, length int, values map[int]string) any {
 		}
 		return res
 	case shaderir.Vec3:
-		res := make([]float32, length * 3)
+		res := make([]float32, length*3)
 		for i := range length * 3 {
 			f, err := strconv.ParseFloat(values[i], 32)
 			if err != nil {
@@ -246,7 +246,7 @@ func parseArrayValue(t shaderir.Type, length int, values map[int]string) any {
 		}
 		return res
 	case shaderir.Vec4:
-		res := make([]float32, length * 4)
+		res := make([]float32, length*4)
 		for i := range length * 4 {
 			f, err := strconv.ParseFloat(values[i], 32)
 			if err != nil {
@@ -256,7 +256,7 @@ func parseArrayValue(t shaderir.Type, length int, values map[int]string) any {
 		}
 		return res
 	case shaderir.IVec2:
-		res := make([]int32, length * 2)
+		res := make([]int32, length*2)
 		for i := range length * 2 {
 			d, err := strconv.ParseInt(values[i], 10, 32)
 			if err != nil {
@@ -266,7 +266,7 @@ func parseArrayValue(t shaderir.Type, length int, values map[int]string) any {
 		}
 		return res
 	case shaderir.IVec3:
-		res := make([]int32, length * 3)
+		res := make([]int32, length*3)
 		for i := range length * 3 {
 			d, err := strconv.ParseInt(values[i], 10, 32)
 			if err != nil {
@@ -276,7 +276,7 @@ func parseArrayValue(t shaderir.Type, length int, values map[int]string) any {
 		}
 		return res
 	case shaderir.IVec4:
-		res := make([]int32, length * 4)
+		res := make([]int32, length*4)
 		for i := range length * 4 {
 			d, err := strconv.ParseInt(values[i], 10, 32)
 			if err != nil {
@@ -286,7 +286,7 @@ func parseArrayValue(t shaderir.Type, length int, values map[int]string) any {
 		}
 		return res
 	case shaderir.Mat2:
-		res := make([]float32, length * 4)
+		res := make([]float32, length*4)
 		for i := range length * 4 {
 			f, err := strconv.ParseFloat(values[i], 32)
 			if err != nil {
@@ -296,7 +296,7 @@ func parseArrayValue(t shaderir.Type, length int, values map[int]string) any {
 		}
 		return res
 	case shaderir.Mat3:
-		res := make([]float32, length * 9)
+		res := make([]float32, length*9)
 		for i := range length * 9 {
 			f, err := strconv.ParseFloat(values[i], 32)
 			if err != nil {
@@ -306,7 +306,7 @@ func parseArrayValue(t shaderir.Type, length int, values map[int]string) any {
 		}
 		return res
 	case shaderir.Mat4:
-		res := make([]float32, length * 16)
+		res := make([]float32, length*16)
 		for i := range length * 16 {
 			f, err := strconv.ParseFloat(values[i], 32)
 			if err != nil {
