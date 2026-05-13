@@ -5,11 +5,15 @@ import (
 	"os"
 	"time"
 
+	"github.com/ebitenui/ebitenui"
+	"github.com/ebitenui/ebitenui/image"
+	"github.com/ebitenui/ebitenui/widget"
 	"github.com/hajimehoshi/ebiten/v2"
+	"golang.org/x/image/colornames"
 )
 
 const (
-	screenWidth  = 512
+	screenWidth  = 1024
 	screenHeight = 512
 )
 
@@ -21,6 +25,7 @@ type Game struct {
 	shader    *ebiten.Shader
 	uniforms  map[string]any
 	startTime time.Time
+	ui        *ebitenui.UI
 }
 
 func (g *Game) width() int {
@@ -39,6 +44,10 @@ func (g *Game) height() int {
 
 // Draw displays the shader on the entire screen
 func (g *Game) Draw(screen *ebiten.Image) {
+	g.ui.Draw(screen)
+
+	geom := ebiten.GeoM{}
+	geom.Translate(512, 0)
 	g.uniforms["Time"] = time.Since(g.startTime).Seconds()
 	screen.DrawRectShader(
 		g.width(),
@@ -47,12 +56,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		&ebiten.DrawRectShaderOptions{
 			Uniforms: g.uniforms,
 			Images:   g.images,
+			GeoM:     geom,
 		},
 	)
 }
 
 // Update does nothing here
 func (g *Game) Update() error {
+	g.ui.Update()
 	return nil
 }
 
@@ -80,11 +91,17 @@ func Run(shaderPath string, uniformFlags []string, imageFlags []string) {
 		log.Panicf("Failed to create shader: %v", err)
 	}
 
+	root := widget.NewContainer(
+		widget.ContainerOpts.BackgroundImage(
+			image.NewNineSliceColor(colornames.Darkslategray),
+		),
+	)
 	game = &Game{
 		shader:    shader,
 		uniforms:  uniforms,
 		startTime: time.Now(),
 		images:    images,
+		ui:        &ebitenui.UI{Container: root},
 	}
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
