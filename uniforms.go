@@ -36,24 +36,53 @@ func defaultUniformValue(t shaderir.Type) any {
 	case shaderir.Mat4:
 		return make([]float64, 16)
 	case shaderir.Array:
-		result := make([]any, t.Length)
-		for i := range t.Length {
-			result[i] = defaultUniformValue(t.Sub[0])
-		}
-		return result
+		return defaultArrayValue(t.Sub[0], t.Length)
 	}
 
 	log.Panicf("Unknown uniform type: %v", t)
 	return 0
 }
 
+func defaultArrayValue(t shaderir.Type, length int) any {
+	switch t.Main {
+	case shaderir.Bool:
+		return make([]bool, length)
+	case shaderir.Int:
+		return make([]int32, length)
+	case shaderir.Float:
+		return make([]float32, length)
+	case shaderir.Vec2:
+		return make([]float32, length * 2)
+	case shaderir.Vec3:
+		return make([]float32, length * 3)
+	case shaderir.Vec4:
+		return make([]float32, length * 4)
+	case shaderir.IVec2:
+		return make([]int32, length * 2)
+	case shaderir.IVec3:
+		return make([]int32, length * 3)
+	case shaderir.IVec4:
+		return make([]int32, length * 4)
+	case shaderir.Mat2:
+		return make([]float64, length * 4)
+	case shaderir.Mat3:
+		return make([]float64, length * 9)
+	case shaderir.Mat4:
+		return make([]float64, length * 16)
+	case shaderir.Array:
+		log.Panicf("Array of array is forbidden")
+	}
+
+	log.Panicf("Unknown array type: %v", t)
+	return make([]any, t.Length)
+}
+
 func parseUniformValue(t shaderir.Type, values map[int]string) any {
-	// TODO: parse Array
 	switch t.Main {
 	case shaderir.Bool:
 		res, err := strconv.ParseBool(values[0])
 		if err != nil {
-			log.Panicf("Failed to parse bool: %s", values[0])
+			log.Printf("Failed to parse bool: %s", values[0])
 		}
 		return res
 	case shaderir.Int:
@@ -101,7 +130,7 @@ func parseUniformValue(t shaderir.Type, values map[int]string) any {
 	case shaderir.IVec2:
 		res := make([]int32, 2)
 		for index := range 2 {
-			f, err := strconv.ParseFloat(values[index], 32)
+			f, err := strconv.ParseInt(values[index], 10, 32)
 			if err != nil {
 				log.Printf("Failed to parse float: %s", values[index])
 			}
@@ -111,7 +140,7 @@ func parseUniformValue(t shaderir.Type, values map[int]string) any {
 	case shaderir.IVec3:
 		res := make([]int32, 3)
 		for index := range 3 {
-			f, err := strconv.ParseFloat(values[index], 32)
+			f, err := strconv.ParseInt(values[index], 10, 32)
 			if err != nil {
 				log.Printf("Failed to parse float: %s", values[index])
 			}
@@ -121,7 +150,7 @@ func parseUniformValue(t shaderir.Type, values map[int]string) any {
 	case shaderir.IVec4:
 		res := make([]int32, 4)
 		for index := range 4 {
-			f, err := strconv.ParseFloat(values[index], 32)
+			f, err := strconv.ParseInt(values[index], 10, 32)
 			if err != nil {
 				log.Printf("Failed to parse float: %s", values[index])
 			}
@@ -158,8 +187,140 @@ func parseUniformValue(t shaderir.Type, values map[int]string) any {
 			res[index] = float32(f)
 		}
 		return res
+	case shaderir.Array:
+		return parseArrayValue(t.Sub[0], t.Length, values)
 	}
 	return 0
+}
+
+func parseArrayValue(t shaderir.Type, length int, values map[int]string) any {
+	switch t.Main {
+	case shaderir.Bool:
+		res := make([]bool, length)
+		for i := range length {
+			b, err := strconv.ParseBool(values[i])
+			if err != nil {
+				log.Printf("Failed to parse bool: %s", values[i])
+			}
+			res[i] = b
+		}
+		return res
+	case shaderir.Int:
+		res := make([]int32, length)
+		for i := range length {
+			d, err := strconv.ParseInt(values[i], 10, 32)
+			if err != nil {
+				log.Printf("Failed to parse bool: %s", values[i])
+			}
+			res[i] = int32(d)
+		}
+		return res
+	case shaderir.Float:
+		res := make([]float32, length)
+		for i := range length {
+			f, err := strconv.ParseFloat(values[i], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[i])
+			}
+			res[i] = float32(f)
+		}
+		return res
+	case shaderir.Vec2:
+		res := make([]float32, length * 2)
+		for i := range length * 2 {
+			f, err := strconv.ParseFloat(values[i], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[i])
+			}
+			res[i] = float32(f)
+		}
+		return res
+	case shaderir.Vec3:
+		res := make([]float32, length * 3)
+		for i := range length * 3 {
+			f, err := strconv.ParseFloat(values[i], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[i])
+			}
+			res[i] = float32(f)
+		}
+		return res
+	case shaderir.Vec4:
+		res := make([]float32, length * 4)
+		for i := range length * 4 {
+			f, err := strconv.ParseFloat(values[i], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[i])
+			}
+			res[i] = float32(f)
+		}
+		return res
+	case shaderir.IVec2:
+		res := make([]int32, length * 2)
+		for i := range length * 2 {
+			d, err := strconv.ParseInt(values[i], 10, 32)
+			if err != nil {
+				log.Printf("Failed to parse bool: %s", values[i])
+			}
+			res[i] = int32(d)
+		}
+		return res
+	case shaderir.IVec3:
+		res := make([]int32, length * 3)
+		for i := range length * 3 {
+			d, err := strconv.ParseInt(values[i], 10, 32)
+			if err != nil {
+				log.Printf("Failed to parse bool: %s", values[i])
+			}
+			res[i] = int32(d)
+		}
+		return res
+	case shaderir.IVec4:
+		res := make([]int32, length * 4)
+		for i := range length * 4 {
+			d, err := strconv.ParseInt(values[i], 10, 32)
+			if err != nil {
+				log.Printf("Failed to parse bool: %s", values[i])
+			}
+			res[i] = int32(d)
+		}
+		return res
+	case shaderir.Mat2:
+		res := make([]float32, length * 4)
+		for i := range length * 4 {
+			f, err := strconv.ParseFloat(values[i], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[i])
+			}
+			res[i] = float32(f)
+		}
+		return res
+	case shaderir.Mat3:
+		res := make([]float32, length * 9)
+		for i := range length * 9 {
+			f, err := strconv.ParseFloat(values[i], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[i])
+			}
+			res[i] = float32(f)
+		}
+		return res
+	case shaderir.Mat4:
+		res := make([]float32, length * 16)
+		for i := range length * 16 {
+			f, err := strconv.ParseFloat(values[i], 32)
+			if err != nil {
+				log.Printf("Failed to parse float: %s", values[i])
+			}
+			res[i] = float32(f)
+		}
+		return res
+	case shaderir.Array:
+		log.Panicf("Array of array is forbidden")
+	}
+
+	log.Panicf("Unknown array type: %v", t)
+	return make([]any, t.Length)
 }
 
 func makeUniformFlagsMap(uniformFlags []string) map[string]map[int]string {
