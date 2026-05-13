@@ -1,0 +1,29 @@
+package sample
+
+var Time float
+var Steepness float // 70
+var Seed vec3 // 15 100 5000
+
+const Pi = 3.14159265358979323846
+
+func shaderRand(p vec2) float {
+	return fract(sin(dot(p.xy, vec2(Seed.x, Seed.y))) * Seed.z)
+}
+
+func Fragment(_ vec4, texCoord vec2, _ vec4) vec4 {
+	img1 := imageSrc0UnsafeAt(texCoord)
+	img2 := imageSrc1UnsafeAt(texCoord)
+
+	progress := Time / 10
+	dist := progress - texCoord.y
+	probability := 1 / (1+exp(-Steepness * dist))
+	random := shaderRand(texCoord)
+
+	if random < probability {
+		return img2
+	} else {
+		return img1
+	}
+
+	return vec4(0)
+}
