@@ -173,6 +173,7 @@ func makeUniformFlagsMap(uniformFlags []string) map[string]map[int]string {
 
 		splitName := strings.Split(split[0], ".")
 		if len(splitName) == 2 {
+			//vector
 			vecIndex, err := strconv.Atoi(splitName[1])
 			if err != nil {
 				log.Panicf("Failed to parse vector index: %s", flag)
@@ -184,6 +185,11 @@ func makeUniformFlagsMap(uniformFlags []string) map[string]map[int]string {
 				parsedFlags[splitName[0]] = map[int]string{
 					vecIndex: split[1],
 				}
+			}
+		} else {
+			//scalar
+			parsedFlags[split[0]] = map[int]string{
+				0: split[1],
 			}
 		}
 	}
