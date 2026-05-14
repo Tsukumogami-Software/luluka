@@ -8,7 +8,7 @@ Luluka lets you view and tweak shaders made with Kage for [Ebiten](https://githu
 Install luluka using the following command:
 
 ```sh
-go install github.com/Tsukumogami-Software/luluka@latest
+go install github.com/Tsukumogami-Software/luluka@v1.0.0
 ```
 
 ## Usage
