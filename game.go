@@ -40,6 +40,13 @@ func (g *Game) height() int {
 // Draw displays the shader on the entire screen
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.uniforms["Time"] = time.Since(g.startTime).Seconds()
+
+	cx, cy := ebiten.CursorPosition()
+	cx64 := min(max(float32(cx), 0.0), float32(g.width()))
+	cy64 := min(max(float32(cy), 0.0), float32(g.height()))
+	g.uniforms["Cursor"] = []float32{cx64 / float32(g.width()), cy64 / float32(g.height())}
+	log.Println(g.uniforms["Cursor"])
+
 	screen.DrawRectShader(
 		g.width(),
 		g.height(),
