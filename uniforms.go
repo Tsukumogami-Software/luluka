@@ -2,13 +2,11 @@ package main
 
 import (
 	"log"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/Tsukumogami-Software/luluka/graphics"
 	"github.com/Tsukumogami-Software/luluka/shaderir"
-	"github.com/goccy/go-yaml"
 )
 
 func defaultUniformValue(t shaderir.Type) any {
@@ -358,20 +356,6 @@ func makeUniformFlagsMap(uniformFlags []string) map[string]map[int]string {
 	return parsedFlags
 }
 
-func parseYaml(valuesFile string) map[string]any {
-	data, err := os.ReadFile(valuesFile)
-	if err != nil {
-		log.Panicf("Failed to read values file: %v", err)
-	}
-
-	var res map[string]any
-	err = yaml.Unmarshal(data, &res)
-	if err != nil {
-		log.Panicf("Failed to read values file: %v", err)
-	}
-	return res
-}
-
 func parseUniformValues(uniformFlags []string, valuesFile string, uniformsDeclarations map[string]shaderir.Type) map[string]any {
 	result := make(map[string]any, len(uniformsDeclarations))
 	for name, t := range uniformsDeclarations {
@@ -380,8 +364,8 @@ func parseUniformValues(uniformFlags []string, valuesFile string, uniformsDeclar
 
 	if valuesFile != "" {
 		uniformFile := parseYaml(valuesFile)
-		for key, values := range uniformFile {
-			result[key] = values
+		for key, value := range uniformFile {
+			result[key] = parseUniformValueFromYAML(uniformsDeclarations[key], value)
 		}
 	}
 
