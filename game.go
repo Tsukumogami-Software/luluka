@@ -45,11 +45,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	cx64 := min(max(float32(cx), 0.0), float32(g.width()))
 	cy64 := min(max(float32(cy), 0.0), float32(g.height()))
 	g.uniforms["Cursor"] = []float32{cx64 / float32(g.width()), cy64 / float32(g.height())}
-	log.Println(g.uniforms["Cursor"])
 
 	mouseButtons := 0b00
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft ) { mouseButtons += 0b10 }
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) { mouseButtons += 0b01 }
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		mouseButtons += 0b10
+	}
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+		mouseButtons += 0b01
+	}
 	g.uniforms["MouseButtons"] = mouseButtons
 
 	screen.DrawRectShader(
