@@ -58,7 +58,7 @@ func (g *Game) Update() error {
 
 // Layout returns a fixed width/height
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return screenWidth, screenHeight
+	return g.width(), g.height() 
 }
 
 func Run(shaderPath string, uniformFlags []string, imageFlags []string) {
@@ -86,6 +86,10 @@ func Run(shaderPath string, uniformFlags []string, imageFlags []string) {
 		startTime: time.Now(),
 		images:    images,
 	}
+
+	ebiten.SetWindowSize(game.width(), game.height())
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
+
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
