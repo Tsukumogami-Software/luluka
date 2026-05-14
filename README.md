@@ -1,6 +1,8 @@
-# Luluka: Ebiten shader tool
+# 📓 Luluka: Ebiten shader tool
 
 Luluka lets you view and tweak shaders made with Kage for [Ebiten](https://github.com/hajimehoshi/ebiten).
+
+<img width="928" height="480" alt="luluka" src="https://github.com/user-attachments/assets/cde37724-a1e6-4d84-ba9c-517c821f92e1" />
 
 
 ## Installation
