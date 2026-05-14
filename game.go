@@ -58,17 +58,17 @@ func (g *Game) Update() error {
 
 // Layout returns a fixed width/height
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return g.width(), g.height() 
+	return g.width(), g.height()
 }
 
-func Run(shaderPath string, uniformFlags []string, imageFlags []string) {
+func Run(shaderPath string, uniformFlags []string, imageFlags []string, valuesFile string) {
 	shaderFile, err := os.ReadFile(shaderPath)
 	if err != nil {
 		log.Panicf("Failed to read shader file: %v", err)
 	}
 
 	uniformsDeclarations := parseUniformDeclarations(shaderFile)
-	uniforms := parseUniformValues(uniformFlags, uniformsDeclarations)
+	uniforms := parseUniformValues(uniformFlags, valuesFile, uniformsDeclarations)
 
 	images := [4]*ebiten.Image{}
 	for i, imageFlag := range imageFlags {

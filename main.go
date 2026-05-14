@@ -30,13 +30,19 @@ Optionally specify uniforms using -u and images using -i.
 			log.Panicf("Cannot use more than 4 images")
 		}
 
-		Run(args[0], uniformFlags, images)
+		values, err := cmd.Flags().GetString("values")
+		if err != nil {
+			log.Panicf("failed to read values flag: %v", err)
+		}
+
+		Run(args[0], uniformFlags, images, values)
 	},
 }
 
 func init() {
 	rootCmd.Flags().StringSliceP("uniform", "u", []string{}, "specifies a uniform value (use name.0 name.1 etc for vectors)")
 	rootCmd.Flags().StringSliceP("images", "i", []string{}, "passes a png image/texture to the shader (max 4)")
+	rootCmd.Flags().StringP("values", "v", "", "uses a yaml file to define uniform values")
 }
 
 func main() {
