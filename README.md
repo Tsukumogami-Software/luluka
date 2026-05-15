@@ -56,6 +56,8 @@ Speed: 0.08
 luluka sample/transition.kage -i image2.png -i image.png -v values.yaml
 ```
 
+If you use both `-v` and `-u`, the values passed with `-u` will have priority and override values from the YAML file
+
 ## Build from source
 
 Clone and compile this repository:
